@@ -1,65 +1,90 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
+export default function StartPage() {
+  const router = useRouter();
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showInstall, setShowInstall] = useState(false);
+
+  // Tangkap event PWA install
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstall(true);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handler);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+    if (choiceResult.outcome === "accepted") {
+      console.log("User accepted the install prompt");
+    } else {
+      console.log("User dismissed the install prompt");
+    }
+    setShowInstall(false);
+    setDeferredPrompt(null);
+  };
+
+  const handleStart = () => {
+    router.push("/camera");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="w-screen h-screen flex flex-col items-center justify-center bg-gradient-to-b from-yellow-200 via-yellow-400 to-yellow-600 text-gray-900 px-6 relative">
+      {/* Card container */}
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl p-8 flex flex-col items-center max-w-sm w-full">
+        {/* Logo */}
+        <img
+          src="/logo.png"
+          alt="Coffee Logo"
+          className="w-44 h-44 mb-6 object-contain"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        <h1 className="text-3xl font-extrabold mb-4 text-center">
+          Coffee Bean Inspector
+        </h1>
+
+        <p className="text-center text-gray-700 mb-8">
+          Detect defects in your coffee beans instantly using AI
+        </p>
+
+        <button
+          onClick={handleStart}
+          className="w-full flex items-center justify-center gap-3 bg-yellow-600 text-white font-semibold px-6 py-4 rounded-2xl shadow-lg hover:bg-yellow-700 active:scale-95 transition transform"
+        >
+          Start Scanning
+        </button>
+      </div>
+
+      {/* Install PWA popup */}
+      {showInstall && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-2xl px-6 py-4 flex items-center justify-between max-w-xs w-full">
+          <span className="text-gray-800 text-sm">
+            Install Coffee Bean Inspector App
+          </span>
+          <button
+            onClick={handleInstall}
+            className="ml-4 bg-yellow-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-yellow-700 transition"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Install
+          </button>
         </div>
-      </main>
+      )}
+
+      {/* Footer */}
+      <p className="text-sm text-white/80 mt-6">
+        Powered by AI Coffee Defect Detection
+      </p>
     </div>
   );
 }

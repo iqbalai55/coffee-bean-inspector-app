@@ -1,0 +1,25 @@
+flowchart TD
+    A[Start] --> B[User Opens Web App]
+    B --> C[Request Camera Permission]
+    C --> D{Permission Granted?}
+    D -->|Yes| E[Show Camera Stream]
+    D -->|No| F[Show Permission Error]
+
+    E --> G[User Chooses Action]
+    G -->|Capture from Camera| H[Take Snapshot & Convert to Base64]
+    G -->|Upload from Gallery| I[Read File & Convert to Base64]
+
+    H --> J[Send Base64 Image to AWS API]
+    I --> J
+
+    J --> K[Wait for API Response]
+    K --> L{API Response Received?}
+    L -->|Yes| M[Receive Detections JSON]
+    L -->|No / Error| N[Show API Error]
+
+    M --> O[Draw Bounding Boxes on Image]
+    O --> P[Display Resulting Image to User]
+
+    P --> Q{User Wants to Retake or Upload Another Image?}
+    Q -->|Yes| G
+    Q -->|No| R[End]
