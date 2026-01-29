@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
     // Panggil Lambda server-side (no CORS issue)
     const res = await fetch(
-      "https://t2smzpxsyewa75myphdgswqlpy0ymkth.lambda-url.ap-southeast-1.on.aws/",
+      "https://moeh-iqbal432--coffee-bean-yolo-predict.modal.run",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
